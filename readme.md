@@ -1,37 +1,39 @@
-# RestAPI for Creating QR Codes
+# Homework 9
+### Lev Zelenin
 
-For this assignment I want you to go over the videos and I've created a X number of errors in the code that you will have to find and fix them.  You should keep running the tests and read the error and try to understand what it mean.  The purpose of this assignment is to get you accustomed to running the project and following the steps that the program uses to process requests.
+## Rest API for QR codes
+Fixed the code and verified API works
 
-Here is my repo with the working code: [https://github.com/kaw393939/fastapi_spring2024](https://github.com/kaw393939/fastapi_spring2024)
+## Non-docker server log
+```
+(venv) levz@LevsLaptop:~/projects/homework9$ ./start.sh
+INFO:     Will watch for changes in these directories: ['/home/levz/projects/homework9']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [47768] using StatReload
+INFO:     Started server process [47770]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+2025-04-06 11:43:36 - root - INFO - Creating QR code for URL: http://example.com/
+2025-04-06 11:43:36 - root - INFO - QR code successfully saved to qr_codes/aHR0cDovL2V4YW1wbGUuY29tLw.png
+INFO:     127.0.0.1:55536 - "POST /qr-codes/ HTTP/1.1" 201 Created
+2025-04-06 11:43:50 - root - INFO - Listing all QR codes.
+INFO:     127.0.0.1:58768 - "GET /qr-codes/ HTTP/1.1" 200 OK
+^CINFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [47770]
+INFO:     Stopping reloader process [47768]
+(venv) levz@LevsLaptop:~/projects/homework9$ ls qr_codes/
+aHR0cDovL2V4YW1wbGUuY29tLw.png
+```
 
-You can get this repo working with the install instructions below.  The assignment repo will not work because its filled with broken code.
-
-**To submit this assignment, you should make your own repository and add the remote to git and then push your fixed code to your own repo.** 
-
-## Grading
-
-You will only get 100 if the entire QR program passes GitHub actions, so you will need to update the production.yml file to have your info and setup your environment variables on the repository.
-
-# Instructor Videos
-* [Rest API Project Overview](https://youtu.be/xEcBKSSXxhQ)
-* [QR Code Overview for Assignment](https://youtu.be/E6b9VkQpQ-U)
-
-
-## Optional but extremely helpful:
-
-1. [Best Series to Learn Bash Scripting Seriously learn this!!!](https://www.youtube.com/playlist?list=PLIhvC56v63IKioClkSNDjW7iz-6TFvLwS)
-
-2.  [Listen to someone else explain FastAPI and go through a project](https://www.youtube.com/watch?v=cbASjoZZGIw)
-
-# Install
-1. Clone
-2. Make virtual environment:  python3 -m venv venv
-3. Activate virtual environment: source venv/bin/activate
-4. Install requirements: pip install -r requirements.txt
-5. **IMPORTANT** run: mkdir qr_codes to create a qr codes directory to save in, permissions will be messed up and the docker container won't be able to write to the qr_codes directory if you don't.
-6. Note: make sure docker is started
-7. run pytest locally to check that it works locally
-8. Start the app with docker compose up --build
-9. Goto http://localhost/docs to view openapi spec documentation
-10. Click "authorize" input username: admin password: secret
-11. Test making,  retrieving, and deleting QR codes on the spec page.
+## Non-docker client log
+```
+(venv) levz@LevsLaptop:~/projects/homework9$ curl -X POST http://localhost:8000/qr-codes/ \
+  -H "Authorization: Bearer secret" \
+  -H "Content-Type: application/json" \
+  -d '{"url":"http://example.com"}'
+{"message":"QR code created successfully.","qr_code_url":"http://localhost/downloads/aHR0cDovL2V4YW1wbGUuY29tLw.png","links":[{"rel":"view","href":"http://localhost/downloads/aHR0cDovL2V4YW1wbGUuY29tLw.png","action":"GET","type":"image/png"},{"rel":"delete","href":"http://localhost/qr-codes/aHR0cDovL2V4YW1wbGUuY29tLw.png","action":"DELETE","type":"application/json"}]}
+(venv) levz@LevsLaptop:~/projects/homework9$ curl -X GET http://localhost:8000/qr-codes/ -H "Authorization: Bearer secret"
+[{"message":"QR code available","qr_code_url":"http://example.com/","links":[{"rel":"view","href":"http://localhost/downloads/aHR0cDovL2V4YW1wbGUuY29tLw.png","action":"GET","type":"image/png"},{"rel":"delete","href":"http://localhost/qr-codes/aHR0cDovL2V4YW1wbGUuY29tLw.png","action":"DELETE","type":"application/json"}]}]
+```
